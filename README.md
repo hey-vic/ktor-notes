@@ -1,6 +1,8 @@
 # ktor-notes
 REST API на Ktor для приложения с заметками.
 
+Приложение: https://github.com/hey-vic/KtorNotes
+
 ## Стек
 - Kotlin
 - Ktor
