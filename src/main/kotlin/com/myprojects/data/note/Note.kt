@@ -7,5 +7,6 @@ data class Note(
     val ownerId: String,
     val title: String,
     val text: String,
+    val modifiedDateTime: String,
     @BsonId val id: ObjectId = ObjectId()
 )

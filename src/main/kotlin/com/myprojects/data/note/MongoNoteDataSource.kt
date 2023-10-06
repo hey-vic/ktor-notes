@@ -30,7 +30,8 @@ class MongoNoteDataSource(
                 Note::id eq ObjectId(noteId),
                 set(
                     Note::title setTo newNote.title,
-                    Note::text setTo newNote.text
+                    Note::text setTo newNote.text,
+                    Note::modifiedDateTime setTo newNote.modifiedDateTime
                 )
             )
                 .wasAcknowledged()

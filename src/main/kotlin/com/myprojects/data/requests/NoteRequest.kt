@@ -5,5 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class NoteRequest(
     val title: String,
-    val text: String
+    val text: String,
+    val modifiedDateTime: String
 )

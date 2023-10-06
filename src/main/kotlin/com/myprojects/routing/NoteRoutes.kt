@@ -11,6 +11,8 @@ import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 fun Route.getNoteById(
     noteDataSource: NoteDataSource
@@ -36,7 +38,8 @@ fun Route.getNoteById(
                 message = NoteResponse(
                     text = note.text,
                     title = note.title,
-                    id = note.id.toString()
+                    id = note.id.toString(),
+                    modifiedDateTime = note.modifiedDateTime
                 )
             )
         }
@@ -60,10 +63,23 @@ fun Route.insertNote(
                 return@post
             }
 
+            val isValidDateTime = try {
+                LocalDateTime.parse(request.modifiedDateTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                true
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
+            if (!isValidDateTime) {
+                call.respond(HttpStatusCode.BadRequest)
+                return@post
+            }
+
             val note = Note(
                 ownerId = userId,
                 title = request.title,
-                text = request.text
+                text = request.text,
+                modifiedDateTime = request.modifiedDateTime
             )
 
             val wasAcknowledged = noteDataSource.insertNote(note)
@@ -94,6 +110,18 @@ fun Route.updateNote(
                 return@put
             }
 
+            val isValidDateTime = try {
+                LocalDateTime.parse(request.modifiedDateTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                true
+            } catch (e: Exception) {
+                e.printStackTrace()
+                false
+            }
+            if (!isValidDateTime) {
+                call.respond(HttpStatusCode.BadRequest)
+                return@put
+            }
+
             val id = call.parameters["id"] ?: return@put call.respond(HttpStatusCode.BadRequest)
             val note = noteDataSource.getNoteById(id)
             if (note == null || note.ownerId != userId) {
@@ -104,7 +132,8 @@ fun Route.updateNote(
             val newNote = Note(
                 ownerId = userId,
                 title = request.title,
-                text = request.text
+                text = request.text,
+                modifiedDateTime = request.modifiedDateTime
             )
 
             val wasAcknowledged = noteDataSource.updateNoteById(id, newNote)
@@ -159,7 +188,6 @@ fun Route.getAllUserNotes(
                 call.respond(HttpStatusCode.BadRequest)
                 return@get
             }
-
             val notes = noteDataSource.getAllNotesOfUserByUserId(userId)
 
             call.respond(
@@ -168,7 +196,8 @@ fun Route.getAllUserNotes(
                     NoteResponse(
                         text = note.text,
                         title = note.title,
-                        id = note.id.toString()
+                        id = note.id.toString(),
+                        modifiedDateTime = note.modifiedDateTime
                     )
                 }
             )

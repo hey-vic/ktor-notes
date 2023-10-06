@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class NoteResponse(
     val title: String,
     val text: String,
-    val id: String
+    val id: String,
+    val modifiedDateTime: String
 )
